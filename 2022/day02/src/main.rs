@@ -5,6 +5,7 @@ fn main() -> std::io::Result<()> {
     let file = File::open(path)?;
     let reader = BufReader::new(file);
     let lines: Vec<String> = reader.lines().filter_map(|lr| lr.ok()).collect();
+    
     let total1_score: u32 = lines.iter().map(|l| {
         let mut chars = l.chars();
         let opponent = chars.next().unwrap();
