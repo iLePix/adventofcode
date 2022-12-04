@@ -5,16 +5,8 @@ fn main() -> std::io::Result<()> {
     let file = File::open(path)?;
     let reader = BufReader::new(file);
     let lines: Vec<String> = reader.lines().filter_map(|lr| lr.ok()).collect();
-    let ranges: Vec<Vec<RangeInclusive<i32>>> = lines.iter().map(|line| {
-        let ranges = line.split(',').into_iter().map(|range| {
-            let r: Vec<i32> = range.split('-').map(|i| i.parse::<i32>().unwrap()).collect();
-            RangeInclusive::new(r[0], r[1])
-        }).collect::<Vec<RangeInclusive<i32>>>();
-        ranges
-    }).collect();
 
-
-    let contains = lines.iter().filter(|line| {
+    let containments = lines.iter().filter(|line| {
         let mut ranges = line.split(',').into_iter().map(|range| {
             let r: Vec<i32> = range.split('-').map(|i| i.parse::<i32>().unwrap()).collect();
             (RangeInclusive::new(r[0], r[1]), r[1] - r[0])
@@ -32,7 +24,7 @@ fn main() -> std::io::Result<()> {
     }).count();
 
     println!("Number of assignment pairs where one range fully contains the other:");
-    println!("{}", contains);
+    println!("{}", containments);
 
     println!("Number of assignment pairs where ranges overlap:");
     println!("{}", overlaps);
