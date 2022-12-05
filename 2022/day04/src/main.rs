@@ -5,6 +5,14 @@ fn main() -> std::io::Result<()> {
     let file = File::open(path)?;
     let reader = BufReader::new(file);
     let lines: Vec<String> = reader.lines().filter_map(|lr| lr.ok()).collect();
+    let ranges: Vec<Vec<RangeInclusive<i32>>> = lines.iter().map(|line| {
+        let ranges = line.split(',').into_iter().map(|range| {
+            let r: Vec<i32> = range.split('-').map(|i| i.parse::<i32>().unwrap()).collect();
+            RangeInclusive::new(r[0], r[1])
+        }).collect::<Vec<RangeInclusive<i32>>>();
+        ranges
+    }).collect();
+
 
     let containments = lines.iter().filter(|line| {
         let mut ranges = line.split(',').into_iter().map(|range| {
