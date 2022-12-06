@@ -1,4 +1,4 @@
-use std::{io::{BufReader, BufRead}, fs::File};
+use std::{io::{BufReader, BufRead}, fs::File, collections::HashSet};
 
 fn main() -> std::io::Result<()> {
     let path = "./input.txt";
@@ -16,7 +16,7 @@ fn find_marker(l: usize, line: &String) -> Option<usize> {
     line.chars()
         .collect::<Vec<char>>()
         .windows(l).map(|w| {
-            w.into_iter().enumerate().all(|(i,c)| !w.iter().enumerate().filter(|(n,c)| i != *n).map(|(_,c)| c).collect::<Vec<&char>>().contains(&c))
+            HashSet::<&char>::from_iter(w.iter()).len() == w.len()
         })
         .enumerate()
         .find(|predicate| predicate.1).map(|(i, _)| i + l)
