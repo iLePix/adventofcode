@@ -103,8 +103,4 @@ impl Dir {
     pub fn new(name: &str, parent: Option<usize>) -> Self {
         Self { name: name.to_string(), children: HashMap::new(), files: HashMap::new(), parent }
     }
-
-    /*pub fn make_dir(&mut self, name: &str) {
-        self.children.insert(Dir::new(name, Some(&self)));
-    }*/
 }
