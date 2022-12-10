@@ -6,10 +6,8 @@ fn main() -> std::io::Result<()> {
     let reader = BufReader::new(file);
     let lines = reader.lines().filter_map(|lr| lr.ok()).collect::<Vec<String>>();
     let steps = parse_steps(lines.iter());
-
-    println!("Part 1: {}" , part1(&steps));
-    println!("Part 2: {}" , part2(&steps));
-
+    println!("Part 1: {}" , count_uniq_tail_pos(&steps, 2));
+    println!("Part 2: {}" , count_uniq_tail_pos(&steps, 10));
 
     Ok(())
 }
@@ -29,60 +27,30 @@ fn parse_steps(lines: Iter<String>) -> Vec<Step> {
     }).collect::<Vec<Step>>()
 }
 
-fn part2(steps: &Vec<Step>) -> usize {
-    let mut tails_pos = [(0,0); 9];
-    let mut head_pos = (0,0);
+fn count_uniq_tail_pos(steps: &Vec<Step>, len: usize) -> usize {
+    let mut tails_pos = vec![(0,0); len];
     let mut pos_visited: HashSet<(i32, i32)> = HashSet::new();
     for step in steps {
         for _ in 0..step.amount {
-            head_pos.0 += step.dir.0;
-            head_pos.1 += step.dir.1;
-            for t in 0..tails_pos.len() {
-                let h_pos = if t == 0 {head_pos} else {tails_pos[t - 1]};
+            tails_pos[0].0 += step.dir.0;
+            tails_pos[0].1 += step.dir.1;
+            for t in 1..tails_pos.len() {
+                let h_pos = tails_pos[t - 1];
                 let mut tail_pos = &mut tails_pos[t];
                 let x_dst = h_pos.0 - tail_pos.0;
                 let y_dst = h_pos.1 - tail_pos.1;
-                if x_dst.abs() > 1 && y_dst == 0 {
-                    tail_pos.0 += x_dst / 2
-                } else if y_dst.abs() > 1 && x_dst == 0 {
-                    tail_pos.1 += y_dst / 2
-                } else if y_dst.abs() > 1 && x_dst.abs() == 1 {
-                    tail_pos.1 += y_dst / 2;
-                    tail_pos.0 += x_dst;
-                } else if x_dst.abs() > 1 && y_dst.abs() == 1 {
-                    tail_pos.1 += y_dst;
-                    tail_pos.0 += x_dst / 2;
+                if x_dst.abs() > 1 || y_dst.abs() > 1 {
+                    if h_pos.0 == tail_pos.0 {
+                        tail_pos.1 += y_dst / 2;
+                    } else if h_pos.1 == tail_pos.1 {
+                        tail_pos.0 += x_dst / 2;
+                    } else {
+                        tail_pos.1 += y_dst / y_dst.abs();
+                        tail_pos.0 += x_dst / x_dst.abs();
+                    }
                 }
             }
-            pos_visited.insert(tails_pos[8]);
-        }
-    }
-    pos_visited.len()
-}
-
-fn part1(steps: &Vec<Step>) -> usize {
-    let mut tail_pos = (0,0);
-    let mut head_pos = (0,0);
-    //tail pos visited
-    let mut pos_visited: HashSet<(i32, i32)> = HashSet::new();
-    for step in steps {
-        for _ in 0..=step.amount {
-            head_pos.0 += step.dir.0;
-            head_pos.1 += step.dir.1;
-            let x_dst = head_pos.0 - tail_pos.0;
-            let y_dst = head_pos.1 - tail_pos.1;
-            if x_dst.abs() > 1 && y_dst == 0 {
-                tail_pos.0 += x_dst / 2
-            } else if y_dst.abs() > 1 && x_dst == 0 {
-                tail_pos.1 += y_dst / 2
-            } else if y_dst.abs() > 1 && x_dst.abs() == 1 {
-                tail_pos.1 += y_dst / 2;
-                tail_pos.0 += x_dst;
-            } else if x_dst.abs() > 1 && y_dst.abs() == 1 {
-                tail_pos.1 += y_dst;
-                tail_pos.0 += x_dst / 2;
-            }
-            pos_visited.insert(tail_pos);
+            pos_visited.insert(*tails_pos.last().unwrap());
         }
     }
     pos_visited.len()
