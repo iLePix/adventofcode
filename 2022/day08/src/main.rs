@@ -66,9 +66,7 @@ fn main() -> std::io::Result<()> {
                     dir_score += 1;
                 }
                 cur *= dir_score;
-                //println!("dir : {:?} score: {}", dir, dir_score);
             }
-            //println!("{} {} {} {}", c_h, cur, x , y);
             if cur > best {
                 best = cur;
             }
