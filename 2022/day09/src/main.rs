@@ -41,12 +41,12 @@ fn count_uniq_tail_pos(steps: &Vec<Step>, len: usize) -> usize {
                 let y_dst = h_pos.1 - tail_pos.1;
                 if x_dst.abs() > 1 || y_dst.abs() > 1 {
                     if h_pos.0 == tail_pos.0 {
-                        tail_pos.1 += y_dst / 2;
+                        tail_pos.1 += if y_dst > 0 {1} else {-1};
                     } else if h_pos.1 == tail_pos.1 {
-                        tail_pos.0 += x_dst / 2;
+                        tail_pos.0 += if x_dst > 0 {1} else {-1};
                     } else {
-                        tail_pos.1 += y_dst / y_dst.abs();
-                        tail_pos.0 += x_dst / x_dst.abs();
+                        tail_pos.1 += if y_dst > 0 {1} else {-1};
+                        tail_pos.0 += if x_dst > 0 {1} else {-1};
                     }
                 }
             }
