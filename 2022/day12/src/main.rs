@@ -57,7 +57,7 @@ fn bfs(start: (usize, usize), dst: (usize, usize), map: Vec<Vec<u8>>) -> Option<
             let new_pos_i = (new_pos.0 as usize, new_pos.1 as usize);
             let cur_height = map[node.0][node.1] as i32;
             let dst_height = map[new_pos_i.0][new_pos_i.1] as i32;
-            if ((cur_height - dst_height).abs() <= 1 || dst_height < cur_height) && !visited[new_pos_i.0][new_pos_i.1] {
+            if dst_height - cur_height <= 1 && !visited[new_pos_i.0][new_pos_i.1] {
                 queue.push(new_pos_i);
                 prevs[new_pos_i.0][new_pos_i.1] = Some(node);
                 visited[new_pos_i.0][new_pos_i.1] = true;
