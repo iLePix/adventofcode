@@ -93,7 +93,7 @@ struct Packet {
     pub right: PacketContent
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Ord)]
 enum PacketContent {
     List(Vec<PacketContent>),
     Value(i32)
@@ -136,10 +136,3 @@ impl PartialOrd for PacketContent {
         Some(Equal)
     }
 }
-
-impl Ord for PacketContent {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        self.partial_cmp(other).unwrap()
-    }
-}
-
