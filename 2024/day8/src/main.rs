@@ -3,16 +3,14 @@ use std::collections::{HashMap, HashSet};
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let input = std::fs::read_to_string("./input.txt")?;
     let map: Vec<Vec<u8>> = input.lines().map(|l| l.bytes().collect()).collect();
-    let height = map.len();
-    let width = map.first().unwrap().len();
+    let (height, width) = (map.len(), map[0].len());
     let mut freq_locs: HashMap<u8, Vec<(i32, i32)>> = HashMap::new();
-    for x in 0..width {
-        for y in 0..height {
-            let freq = map[y][x];
+    for (y, row) in map.iter().enumerate() {
+        for (x, &freq) in row.iter().enumerate() {
             if freq != b'.' {
                 freq_locs
                     .entry(freq)
-                    .or_insert(vec![])
+                    .or_default()
                     .push((x as i32, y as i32));
             }
         }
@@ -27,15 +25,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 fn task1(freq_locs: &HashMap<u8, Vec<(i32, i32)>>, width: usize, height: usize) -> usize {
     let mut antinodes = HashSet::new();
     for locs in freq_locs.values() {
-        for n in 0..locs.len() {
-            for m in 0..locs.len() {
-                if n == m {
-                    continue;
-                }
-                let dist = (locs[n].0 - locs[m].0, locs[n].1 - locs[m].1);
-                let antinode = (locs[n].0 + dist.0, locs[n].1 + dist.1);
-                if in_bounds(antinode.0, antinode.1, width, height) {
-                    antinodes.insert(antinode);
+        for (i, &a) in locs.iter().enumerate() {
+            for (j, &b) in locs.iter().enumerate() {
+                if i != j {
+                    let antinode = (a.0 + (a.0 - b.0), a.1 + (a.1 - b.1));
+                    if in_bounds(antinode.0, antinode.1, width, height) {
+                        antinodes.insert(antinode);
+                    }
                 }
             }
         }
@@ -46,23 +42,21 @@ fn task1(freq_locs: &HashMap<u8, Vec<(i32, i32)>>, width: usize, height: usize) 
 fn task2(freq_locs: &HashMap<u8, Vec<(i32, i32)>>, width: usize, height: usize) -> usize {
     let mut antinodes = HashSet::new();
     for locs in freq_locs.values() {
-        for n in 0..locs.len() {
-            for m in 0..locs.len() {
-                if n == m {
-                    continue;
-                }
-                let dist = (locs[n].0 - locs[m].0, locs[n].1 - locs[m].1);
-                let mut antinode = (locs[n].0, locs[n].1);
-                while in_bounds(antinode.0, antinode.1, width, height) {
-                    antinodes.insert(antinode);
-                    antinode = (antinode.0 + dist.0, antinode.1 + dist.1);
+        for (i, &a) in locs.iter().enumerate() {
+            for (j, &b) in locs.iter().enumerate() {
+                if i != j {
+                    let (dx, dy) = (a.0 - b.0, a.1 - b.1);
+                    let mut antinode = (a.0, a.1);
+                    while in_bounds(antinode.0, antinode.1, width, height) {
+                        antinodes.insert(antinode);
+                        antinode = (antinode.0 + dx, antinode.1 + dy);
+                    }
                 }
             }
         }
     }
     antinodes.len()
 }
-
 fn in_bounds(x: i32, y: i32, width: usize, height: usize) -> bool {
     x >= 0 && y >= 0 && x < width as i32 && y < height as i32
 }
